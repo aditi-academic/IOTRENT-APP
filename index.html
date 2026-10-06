@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IOTRENT • Campus Hardware Lending Platform</title>
+
+  <!-- Google Fonts: Share Tech for display, Inter for UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Share+Tech&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            tech: ['"Share Tech"', 'monospace', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom clean scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-8">
+        <a href="#" class="flex items-center gap-2 group">
+          <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+            </svg>
+          </div>
+          <div>
+            <span class="font-tech text-2xl font-bold tracking-wider text-slate-900 block leading-tight">IOTRENT</span>
+            <span class="text-[10px] uppercase font-bold tracking-widest text-brand-600 block -mt-1">KIET Campus Hub</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-600">
+          <a href="#catalog" class="hover:text-brand-600 transition flex items-center gap-1.5">
+            <span>Browse Gear</span>
+          </a>
+          <button onclick="openListingModal()" class="hover:text-brand-600 transition flex items-center gap-1.5 text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>List Your Kit</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Campus Location & Actions -->
+      <div class="flex items-center gap-3">
+        <!-- Campus Zone Pill -->
+        <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 px-3 py-1.5 rounded-full text-xs font-semibold text-slate-700 transition">
+          <span class="text-rose-500">📍</span>
+          <select id="locationFilter" onchange="filterHardware()" class="bg-transparent border-none outline-none cursor-pointer pr-1 text-xs font-semibold text-slate-700">
+            <option value="all">Everywhere on Campus</option>
+            <option value="gargi">Gargi Hostel</option>
+            <option value="tagore">Tagore Hostel</option>
+            <option value="chandragupta">Chandragupta Hostel</option>
+            <option value="dayscholar">Day Scholar / Main Gate</option>
+          </select>
+        </div>
+
+        <!-- Student Profile / Dashboard Trigger -->
+        <button onclick="openDashboard()" class="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 transition text-left group">
+          <div class="w-7 h-7 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">
+            AG
+          </div>
+          <div class="hidden lg:block text-left">
+            <p class="text-xs font-bold text-slate-800 leading-tight">Aditi G.</p>
+            <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ID Verified
+            </p>
+          </div>
+          <span class="text-xs text-slate-400 group-hover:text-slate-600 ml-1">⚡ My Hub</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="relative bg-gradient-to-b from-white via-blue-50/30 to-[#F8FAFC] pt-12 pb-14 px-4 sm:px-6 border-b border-slate-200">
+    <div class="max-w-4xl mx-auto text-center relative z-10">
+      
+      <!-- Trust Pill -->
+      <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-bold px-3.5 py-1.5 rounded-full mb-5 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        Zero Cash Deposit • 100% Student ID Accountability
+      </div>
+
+      <h1 class="font-tech text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
+        DON’T BUY FOR A SEMESTER. <br />
+        <span class="text-brand-600 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+          RENT FOR A SUBMISSION.
+        </span>
+      </h1>
+
+      <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed font-normal">
+        Borrow verified Arduinos, ESP32 modules, sensors, and full kits straight from seniors and batchmates on campus. Pick up at hostel gates in minutes; return when graded.
+      </p>
+
+      <!-- Trust Pillars -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto text-left">
+        <div class="bg-white/80 backdrop-blur border border-slate-200/80 rounded-xl p-3 flex items-center gap-3 shadow-xs">
+          <div class="w-9 h-9 rounded-lg bg-blue-50 text-brand-600 flex items-center justify-center font-bold text-lg shrink-0">
+            ⚡
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900">Breadboard Tested</h4>
+            <p class="text-[11px] text-slate-500">Inspected by seniors before handover</p>
+          </div>
+        </div>
+
+        <div class="bg-white/80 backdrop-blur border border-slate-200/80 rounded-xl p-3 flex items-center gap-3 shadow-xs">
+          <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg shrink-0">
+            🛡️
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900">No Cash Deposit</h4>
+            <p class="text-[11px] text-slate-500">Secured via Campus ID & ERP lock</p>
+          </div>
+        </div>
+
+        <div class="bg-white/80 backdrop-blur border border-slate-200/80 rounded-xl p-3 flex items-center gap-3 shadow-xs">
+          <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg shrink-0">
+            📍
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900">Hostel & Gate Pickup</h4>
+            <p class="text-[11px] text-slate-500">Zero shipping lag, 5-minute meetup</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MAIN CATALOG VIEW -->
+  <main id="catalog" class="max-w-7xl mx-auto px-4 sm:px-6 py-10 flex-1 w-full">
+    
+    <!-- Controls Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div>
+        <h2 class="font-tech text-3xl font-bold text-slate-900 tracking-wide flex items-center gap-2">
+          AVAILABLE HARDWARE
+          <span id="itemCountBadge" class="font-sans text-xs bg-brand-100 text-brand-700 font-bold px-2 py-0.5 rounded-full">3 live</span>
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Tested microcontrollers and kits ready for immediate campus pickup.</p>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button onclick="openListingModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow-sm transition">
+          <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          List Unused Hardware
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Bar & Category Filter Pills -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl p-4 mb-8 shadow-xs space-y-4">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <!-- Search Input -->
+        <div class="relative flex-1">
+          <span class="absolute left-3.5 top-3 text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </span>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search Arduino, ESP32, Ultrasonic, Servo, Jumper kits..." 
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+            oninput="filterHardware()"
+          />
+        </div>
+
+        <!-- Mobile Location Dropdown -->
+        <div class="sm:hidden">
+          <select id="mobileLocationFilter" onchange="syncLocation(this.value)" class="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700">
+            <option value="all">Everywhere on Campus</option>
+            <option value="gargi">Gargi Hostel</option>
+            <option value="tagore">Tagore Hostel</option>
+            <option value="chandragupta">Chandragupta Hostel</option>
+            <option value="dayscholar">Day Scholar / Main Gate</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Categories Pills -->
+      <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">Filter:</span>
+        <button onclick="setCategory('all')" class="cat-pill active bg-brand-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition" data-cat="all">All Hardware</button>
+        <button onclick="setCategory('microcontroller')" class="cat-pill bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition" data-cat="microcontroller">Microcontrollers</button>
+        <button onclick="setCategory('sensor')" class="cat-pill bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition" data-cat="sensor">Sensors</button>
+        <button onclick="setCategory('module')" class="cat-pill bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition" data-cat="module">Modules & Displays</button>
+        <button onclick="setCategory('bundle')" class="cat-pill bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition" data-cat="bundle">Complete Viva Kits</button>
+      </div>
+    </div>
+
+    <!-- Catalog Grid -->
+    <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Injected by JavaScript -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyCatalogState" class="hidden text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300 p-8">
+      <div class="w-16 h-16 bg-blue-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+        🔍
+      </div>
+      <h3 class="text-lg font-bold text-slate-800 mb-1">No components match your search</h3>
+      <p class="text-sm text-slate-500 max-w-md mx-auto mb-6">Can’t find what you need for lab? Post a request or ask seniors in the hardware channel.</p>
+      <button onclick="resetFilters()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs px-4 py-2 rounded-xl transition">
+        Reset Search & Filters
+      </button>
+    </div>
+  </main>
+
+  <!-- RENTAL CHECKOUT & OTP MODAL -->
+  <div id="checkoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative border border-slate-100 overflow-hidden transform transition-all">
+      
+      <!-- Close Button -->
+      <button onclick="closeModal('checkoutModal')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition">
+        ✕
+      </button>
+
+      <!-- STEP 1: REVIEW RENTAL & ZERO DEPOSIT -->
+      <div id="checkoutStep1">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-[11px] font-bold uppercase tracking-wider bg-brand-100 text-brand-700 px-2.5 py-0.5 rounded-full">
+            Campus Reservation
+          </span>
+          <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            ✓ Student Verified
+          </span>
+        </div>
+
+        <h3 id="modalItemTitle" class="text-2xl font-tech font-bold text-slate-900 mb-1">Arduino Uno R3</h3>
+        <p id="modalItemBundle" class="text-xs text-brand-600 font-medium mb-5">+ Breadboard & 10 Jumper Wires included</p>
+
+        <!-- Breakdown Card -->
+        <div class="bg-slate-50 rounded-xl p-4 space-y-2.5 text-sm border border-slate-200 mb-5">
+          <div class="flex justify-between items-center text-slate-600">
+            <span>Rental Duration:</span>
+            <span class="font-semibold text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200 text-xs">7 Days (Viva Evaluation)</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600">
+            <span>Weekly Rental Fee:</span>
+            <span id="modalWeeklyRent" class="font-bold text-slate-900">₹30</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-600 flex items-center gap-1">
+              Security Deposit:
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded">WAIVED</span>
+            </span>
+            <span class="font-bold text-emerald-600">₹0 (No cash lock)</span>
+          </div>
+
+          <div class="pt-3 border-t border-slate-200 flex justify-between items-center">
+            <span class="font-bold text-slate-900 text-base">Total Pay at Handover:</span>
+            <span id="modalTotalPay" class="font-tech text-2xl font-bold text-brand-600">₹30</span>
+          </div>
+        </div>
+
+        <!-- Accountability Card -->
+        <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-3.5 mb-6 text-xs text-slate-600 space-y-1.5">
+          <p class="font-bold text-blue-900 flex items-center gap-1.5">
+            <span>🛡️</span> Zero-Deposit Student Trust Agreement
+          </p>
+          <p>
+            By booking, you agree to return all parts in working condition. Your institutional ID (<strong class="text-slate-800">KIET-CS-2026</strong>) acts as collateral. No UPI hold required!
+          </p>
+          <p id="modalHandoverLocation" class="text-slate-700 font-medium pt-1">
+            📍 Handover Location: <strong>Main Gate / Tech Block Canteen</strong>
+          </p>
+        </div>
+
+        <button onclick="processBookingConfirmation()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2">
+          <span>Generate Handover OTP & Meetup Pass</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+      </div>
+
+      <!-- STEP 2: LIVE OTP & HANDOVER PASS (SHOWN AFTER CONFIRMATION) -->
+      <div id="checkoutStep2" class="hidden text-center py-2">
+        <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
+          ✓
+        </div>
+        <h4 class="text-xl font-bold text-slate-900">Rental Reserved!</h4>
+        <p class="text-xs text-slate-500 mb-5">Show this OTP to the lender during physical handover on campus.</p>
+
+        <!-- OTP BOX -->
+        <div class="bg-slate-900 text-white rounded-2xl p-5 mb-5 shadow-inner">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400 block mb-1">4-Digit Handover Verification OTP</span>
+          <div id="generatedOtpCode" class="font-tech text-4xl font-bold tracking-widest text-emerald-400">
+            4892
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2">Lender enters this OTP in their portal to start the 7-day clock.</p>
+        </div>
+
+        <!-- Lender Contact Strip -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-left text-xs mb-5 space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500">Lender:</span>
+            <strong id="passLenderName" class="text-slate-800 text-sm">Rohan Sharma (3rd Year)</strong>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500">Hostel / Meetup:</span>
+            <span id="passLocation" class="text-slate-700 font-medium">Gargi Hostel Lawn</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500">Pay on Handover:</span>
+            <span id="passAmount" class="font-bold text-brand-600">₹30 (Cash / UPI)</span>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="triggerMockWhatsApp()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+            <span>💬 Chat on WhatsApp</span>
+          </button>
+          <button onclick="viewInDashboard()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs transition">
+            Open in My Hub
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LIST YOUR KIT MODAL (SUPPLY SIDE) -->
+  <div id="listingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative border border-slate-100 max-h-[90vh] overflow-y-auto">
+      
+      <button onclick="closeModal('listingModal')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition">
+        ✕
+      </button>
+
+      <div class="mb-4">
+        <span class="text-[11px] font-bold text-brand-600 uppercase tracking-wider bg-brand-50 px-2.5 py-1 rounded-full">Lender Portal</span>
+        <h3 class="text-2xl font-tech font-bold text-slate-900 mt-1">LIST UNUSED HARDWARE</h3>
+        <p class="text-xs text-slate-500">Monetize extra microcontrollers and kits sitting in your hostel drawers.</p>
+      </div>
+
+      <form id="newListingForm" onsubmit="handleNewListing(event)" class="space-y-4 text-xs">
+        
+        <!-- Component Name -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Component Title *</label>
+          <input 
+            type="text" 
+            id="listTitle" 
+            placeholder="e.g., Raspberry Pi Pico W / ESP8266" 
+            required 
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+          />
+        </div>
+
+        <!-- Category & Rent Rate -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Category *</label>
+            <select id="listCategory" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+              <option value="microcontroller">Microcontroller</option>
+              <option value="sensor">Sensor / Probe</option>
+              <option value="module">Module / Screen</option>
+              <option value="bundle">Complete Viva Bundle</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Weekly Rent (₹) *</label>
+            <input 
+              type="number" 
+              id="listRent" 
+              placeholder="e.g. 40" 
+              min="10" 
+              max="500" 
+              required 
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+            />
+          </div>
+        </div>
+
+        <!-- Included Accessories -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Included Accessories / Wires</label>
+          <input 
+            type="text" 
+            id="listBundle" 
+            placeholder="e.g., + Mini Breadboard + 5 Female-Female Jumpers" 
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+          />
+        </div>
+
+        <!-- Campus Pickup Zone -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Pickup Campus Zone *</label>
+            <select id="listLocation" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+              <option value="gargi">Gargi Hostel</option>
+              <option value="tagore">Tagore Hostel</option>
+              <option value="chandragupta">Chandragupta Hostel</option>
+              <option value="dayscholar">Day Scholar (Main Gate)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Your Name & Year *</label>
+            <input 
+              type="text" 
+              id="listLender" 
+              placeholder="e.g. Harsh (3rd Yr CS)" 
+              required 
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+            />
+          </div>
+        </div>
+
+        <!-- Working Condition Check -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-start gap-2.5">
+          <input type="checkbox" id="workingCheck" required class="mt-0.5 rounded text-brand-600 focus:ring-brand-500" />
+          <label for="workingCheck" class="text-slate-600 leading-tight">
+            I verify that this board powers on, passes serial loopback, and GPIO pins have no broken traces.
+          </label>
+        </div>
+
+        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition text-sm shadow-md">
+          Publish Listing Instantly
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- STUDENT DASHBOARD DRAWER -->
+  <div id="dashboardModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-end">
+    <div class="bg-white w-full max-w-md h-full shadow-2xl p-6 flex flex-col justify-between overflow-y-auto transform transition-transform">
+      
+      <div>
+        <!-- Drawer Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+              AG
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 leading-tight">Aditi Gangwar</h3>
+              <p class="text-xs text-slate-500">Student ID: #KIET-2026 • 3rd Year</p>
+            </div>
+          </div>
+          <button onclick="closeModal('dashboardModal')" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-200 mb-5 text-xs font-bold">
+          <button id="tabBorrowBtn" onclick="switchDashboardTab('borrow')" class="pb-2.5 border-b-2 border-brand-600 text-brand-600 flex-1">
+            Borrowed (Active)
+          </button>
+          <button id="tabLendBtn" onclick="switchDashboardTab('lend')" class="pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex-1">
+            My Listed Gear (<span id="myListingsCount">1</span>)
+          </button>
+        </div>
+
+        <!-- Tab 1: Borrowed Active Rentals -->
+        <div id="tabBorrowedContent" class="space-y-4">
+          <div id="activeRentalsList" class="space-y-3">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Tab 2: My Listed Gear -->
+        <div id="tabLentContent" class="hidden space-y-4">
+          <div class="bg-brand-50 border border-brand-100 rounded-xl p-3 flex justify-between items-center text-xs">
+            <span class="text-brand-900 font-semibold">Total Rent Earned This Month:</span>
+            <strong class="text-brand-700 text-sm font-tech">₹120</strong>
+          </div>
+
+          <div id="myListingsList" class="space-y-3">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="pt-6 border-t border-slate-200 mt-6 text-center text-xs text-slate-400">
+        <p>Zero-Deposit Campus Node #04</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-8 px-4 sm:px-6 mt-12 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-tech text-lg font-bold text-slate-800">IOTRENT</span>
+        <span>• Peer-to-Peer Campus Hardware Sharing</span>
+      </div>
+      <p class="text-slate-400">Designed with ID-accountability for student engineering labs.</p>
+    </div>
+  </footer>
+
+  <!-- APPLICATION JAVASCRIPT LOGIC -->
+  <script>
+    // INITIAL INVENTORY WITH COMPONENT SVG ICONS
+    let inventory = [
+      {
+        id: 1,
+        name: "Arduino Uno R3 Kit",
+        category: "microcontroller",
+        bundle: "+ Breadboard & 10 Jumpers + USB-B",
+        lender: "Rohan Sharma (3rd Year)",
+        location: "dayscholar",
+        locationName: "Day Scholar (Main Gate)",
+        rent: 30,
+        available: true,
+        iconType: "arduino",
+        accent: "bg-blue-600"
+      },
+      {
+        id: 2,
+        name: "ESP32 NodeMCU Wi-Fi + BLE",
+        category: "microcontroller",
+        bundle: "+ Micro-USB Cable & Soldered Pins",
+        lender: "Neha (3rd Year)",
+        location: "gargi",
+        locationName: "Gargi Hostel",
+        rent: 60,
+        available: true,
+        iconType: "chip",
+        accent: "bg-indigo-600"
+      },
+      {
+        id: 3,
+        name: "HC-SR04 Ultrasonic Kit",
+        category: "sensor",
+        bundle: "+ 0.96\" I2C OLED Display",
+        lender: "Aman (3rd Year)",
+        location: "tagore",
+        locationName: "Tagore Hostel",
+        rent: 50,
+        available: true,
+        iconType: "sensor",
+        accent: "bg-teal-600"
+      }
+    ];
+
+    // USER DATA (LOCAL STATE)
+    let userRentals = [
+      {
+        id: 101,
+        title: "Arduino Uno R3 Kit",
+        lender: "Rohan Sharma",
+        otp: "4892",
+        due: "8 Oct 2026",
+        status: "Active • Viva in 3 Days",
+        rent: 30
+      }
+    ];
+
+    let userListings = [
+      {
+        id: 201,
+        title: "Raspberry Pi Pico (Pre-soldered)",
+        rent: 40,
+        location: "Gargi Hostel",
+        status: "Available"
+      }
+    ];
+
+    let selectedItemForRent = null;
+    let currentCategory = 'all';
+
+    // SVG Illustration Generator for Hardware
+    function getHardwareSvg(type) {
+      if (type === 'arduino') {
+        return `
+          <svg class="w-20 h-20 text-blue-500" viewBox="0 0 100 70" fill="currentColor">
+            <rect x="5" y="10" width="85" height="50" rx="6" fill="#008184" />
+            <rect x="0" y="25" width="12" height="20" rx="2" fill="#94a3b8" />
+            <rect x="25" y="3" width="16" height="10" rx="2" fill="#1e293b" />
+            <circle cx="28" cy="40" r="10" fill="#0f172a" />
+            <circle cx="25" cy="40" r="3" fill="#38bdf8" />
+            <circle cx="31" cy="40" r="3" fill="#38bdf8" />
+            <circle cx="78" cy="22" r="3" fill="#facc15" />
+            <rect x="48" y="25" width="35" height="6" fill="#1e293b" />
+            <rect x="48" y="45" width="35" height="6" fill="#1e293b" />
+          </svg>
+        `;
+      } else if (type === 'chip') {
+        return `
+          <svg class="w-20 h-20 text-indigo-500" viewBox="0 0 100 70" fill="currentColor">
+            <rect x="15" y="10" width="70" height="50" rx="4" fill="#1e293b" />
+            <rect x="30" y="20" width="40" height="30" rx="3" fill="#94a3b8" />
+            <circle cx="24" cy="20" r="2.5" fill="#ef4444" />
+            <circle cx="24" cy="28" r="2.5" fill="#3b82f6" />
+            <path d="M15 15h-4M15 25h-4M15 35h-4M15 45h-4M15 55h-4M85 15h4M85 25h4M85 35h4M85 45h4M85 55h4" stroke="#e2e8f0" stroke-width="2" />
+          </svg>
+        `;
+      } else {
+        return `
+          <svg class="w-20 h-20 text-teal-500" viewBox="0 0 100 70" fill="currentColor">
+            <rect x="15" y="20" width="70" height="30" rx="4" fill="#0d9488" />
+            <circle cx="35" cy="35" r="12" fill="#cbd5e1" stroke="#334155" stroke-width="3" />
+            <circle cx="65" cy="35" r="12" fill="#cbd5e1" stroke="#334155" stroke-width="3" />
+            <circle cx="35" cy="35" r="4" fill="#475569" />
+            <circle cx="65" cy="35" r="4" fill="#475569" />
+            <rect x="46" y="50" width="8" height="6" fill="#f59e0b" />
+          </svg>
+        `;
+      }
+    }
+
+    // Render Hardware Cards Grid
+    function renderCatalog(items) {
+      const grid = document.getElementById('cardsGrid');
+      const emptyState = document.getElementById('emptyCatalogState');
+      const countBadge = document.getElementById('itemCountBadge');
+
+      countBadge.innerText = `${items.length} live`;
+      grid.innerHTML = '';
+
+      if (items.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      items.forEach(item => {
+        grid.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-lg hover:border-slate-300 transition-all flex flex-col justify-between group">
+            <div>
+              <!-- Graphic Banner -->
+              <div class="h-44 w-full bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl mb-4 flex items-center justify-center relative border border-slate-100 overflow-hidden">
+                ${getHardwareSvg(item.iconType || 'arduino')}
+                <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-[10px] font-bold text-slate-700 px-2.5 py-1 rounded-md shadow-xs border border-slate-200/60 uppercase tracking-wider">
+                  ${item.category}
+                </span>
+                <span class="absolute top-3 right-3 bg-emerald-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> Available
+                </span>
+              </div>
+
+              <!-- Title & Bundles -->
+              <h3 class="font-tech text-2xl font-bold text-slate-900 group-hover:text-brand-600 transition tracking-wide">
+                ${item.name}
+              </h3>
+              <p class="text-xs font-semibold text-brand-600 mb-3.5 flex items-center gap-1">
+                <span>📦</span> ${item.bundle}
+              </p>
+
+              <!-- Lender Details Strip -->
+              <div class="bg-slate-50 rounded-xl p-3 text-xs text-slate-600 mb-5 space-y-1.5 border border-slate-100">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-400">Lender:</span>
+                  <span class="font-bold text-slate-800">${item.lender}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-400">Handover Spot:</span>
+                  <span class="font-medium text-slate-700">📍 ${item.locationName}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer: Price & Rent Action -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+              <div>
+                <div class="flex items-baseline gap-1">
+                  <span class="font-tech text-2xl font-extrabold text-slate-900">₹${item.rent}</span>
+                  <span class="text-xs text-slate-400">/ week</span>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-600 block">₹0 Cash Deposit</span>
+              </div>
+
+              <button onclick="openCheckoutModal(${item.id})" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-md shadow-brand-500/20 transition flex items-center gap-1.5">
+                <span>Rent Now</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Filter Logic
+    function filterHardware() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const loc = document.getElementById('locationFilter').value;
+
+      const filtered = inventory.filter(item => {
+        const matchesQuery = item.name.toLowerCase().includes(query) || 
+                             item.bundle.toLowerCase().includes(query) || 
+                             item.lender.toLowerCase().includes(query);
+        const matchesCategory = currentCategory === 'all' || item.category === currentCategory;
+        const matchesLoc = loc === 'all' || item.location === loc;
+        return matchesQuery && matchesCategory && matchesLoc;
+      });
+
+      renderCatalog(filtered);
+    }
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = "cat-pill active bg-brand-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition";
+        } else {
+          btn.className = "cat-pill bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition";
+        }
+      });
+      filterHardware();
+    }
+
+    function syncLocation(val) {
+      document.getElementById('locationFilter').value = val;
+      filterHardware();
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('locationFilter').value = 'all';
+      setCategory('all');
+    }
+
+    // MODAL HANDLERS
+    function openCheckoutModal(id) {
+      selectedItemForRent = inventory.find(i => i.id === id);
+      if (!selectedItemForRent) return;
+
+      document.getElementById('modalItemTitle').innerText = selectedItemForRent.name;
+      document.getElementById('modalItemBundle').innerText = selectedItemForRent.bundle;
+      document.getElementById('modalWeeklyRent').innerText = `₹${selectedItemForRent.rent}`;
+      document.getElementById('modalTotalPay').innerText = `₹${selectedItemForRent.rent}`;
+      document.getElementById('modalHandoverLocation').innerHTML = `📍 Handover Location: <strong>${selectedItemForRent.locationName}</strong>`;
+
+      // Reset steps
+      document.getElementById('checkoutStep1').classList.remove('hidden');
+      document.getElementById('checkoutStep2').classList.add('hidden');
+      document.getElementById('checkoutModal').classList.remove('hidden');
+    }
+
+    function processBookingConfirmation() {
+      if (!selectedItemForRent) return;
+
+      // Generate random 4-digit code
+      const randomOtp = Math.floor(1000 + Math.random() * 9000);
+
+      document.getElementById('generatedOtpCode').innerText = randomOtp;
+      document.getElementById('passLenderName').innerText = selectedItemForRent.lender;
+      document.getElementById('passLocation').innerText = selectedItemForRent.locationName;
+      document.getElementById('passAmount').innerText = `₹${selectedItemForRent.rent} (At Handover)`;
+
+      // Add to user rentals
+      userRentals.unshift({
+        id: Date.now(),
+        title: selectedItemForRent.name,
+        lender: selectedItemForRent.lender,
+        otp: randomOtp,
+        due: "7 Days from meetup",
+        status: "Awaiting Handover OTP",
+        rent: selectedItemForRent.rent
+      });
+
+      // Switch to step 2
+      document.getElementById('checkoutStep1').classList.add('hidden');
+      document.getElementById('checkoutStep2').classList.remove('hidden');
+    }
+
+    function triggerMockWhatsApp() {
+      if (!selectedItemForRent) return;
+      const text = encodeURIComponent(`Hi ${selectedItemForRent.lender}! I just reserved your ${selectedItemForRent.name} on IOTRENT. Can we meet at ${selectedItemForRent.locationName} for the handover?`);
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+
+    function openListingModal() {
+      document.getElementById('listingModal').classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // CREATE NEW LISTING
+    function handleNewListing(e) {
+      e.preventDefault();
+      
+      const title = document.getElementById('listTitle').value.trim();
+      const cat = document.getElementById('listCategory').value;
+      const rent = parseInt(document.getElementById('listRent').value, 10);
+      const bundle = document.getElementById('listBundle').value.trim() || "+ Ready for Breadboard";
+      const locKey = document.getElementById('listLocation').value;
+      const lender = document.getElementById('listLender').value.trim();
+
+      const locLabels = {
+        gargi: "Gargi Hostel",
+        tagore: "Tagore Hostel",
+        chandragupta: "Chandragupta Hostel",
+        dayscholar: "Day Scholar (Main Gate)"
+      };
+
+      const newItem = {
+        id: Date.now(),
+        name: title,
+        category: cat,
+        bundle: bundle,
+        lender: lender,
+        location: locKey,
+        locationName: locLabels[locKey] || "Campus Hub",
+        rent: rent,
+        available: true,
+        iconType: cat === 'sensor' ? 'sensor' : 'chip'
+      };
+
+      // Add to catalog and user listings
+      inventory.unshift(newItem);
+      userListings.unshift({
+        id: newItem.id,
+        title: newItem.name,
+        rent: newItem.rent,
+        location: newItem.locationName,
+        status: "Active"
+      });
+
+      // Reset and close
+      document.getElementById('newListingForm').reset();
+      closeModal('listingModal');
+      filterHardware();
+
+      alert(`Success! "${newItem.name}" is now live on the IOTRENT campus catalog.`);
+    }
+
+    // DASHBOARD & TABS
+    function openDashboard() {
+      renderDashboardItems();
+      document.getElementById('dashboardModal').classList.remove('hidden');
+    }
+
+    function switchDashboardTab(tab) {
+      const borrowBtn = document.getElementById('tabBorrowBtn');
+      const lendBtn = document.getElementById('tabLendBtn');
+      const borrowContent = document.getElementById('tabBorrowedContent');
+      const lendContent = document.getElementById('tabLentContent');
+
+      if (tab === 'borrow') {
+        borrowBtn.className = "pb-2.5 border-b-2 border-brand-600 text-brand-600 flex-1";
+        lendBtn.className = "pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex-1";
+        borrowContent.classList.remove('hidden');
+        lendContent.classList.add('hidden');
+      } else {
+        lendBtn.className = "pb-2.5 border-b-2 border-brand-600 text-brand-600 flex-1";
+        borrowBtn.className = "pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex-1";
+        lendContent.classList.remove('hidden');
+        borrowContent.classList.add('hidden');
+      }
+    }
+
+    function renderDashboardItems() {
+      const rentalContainer = document.getElementById('activeRentalsList');
+      const listingsContainer = document.getElementById('myListingsList');
+      document.getElementById('myListingsCount').innerText = userListings.length;
+
+      // Active Rentals
+      rentalContainer.innerHTML = '';
+      if (userRentals.length === 0) {
+        rentalContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No active hardware rentals.</p>`;
+      } else {
+        userRentals.forEach(r => {
+          rentalContainer.innerHTML += `
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-tech text-base font-bold text-slate-900">${r.title}</h4>
+                  <p class="text-[11px] text-slate-500">Lender: ${r.lender} • Due: ${r.due}</p>
+                </div>
+                <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">${r.status}</span>
+              </div>
+              <div class="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100 text-xs">
+                <span class="text-slate-500">Handover OTP:</span>
+                <span class="font-tech font-bold text-brand-600 tracking-wider text-sm">${r.otp}</span>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      // My Listed Items
+      listingsContainer.innerHTML = '';
+      if (userListings.length === 0) {
+        listingsContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">You haven't listed any components yet.</p>`;
+      } else {
+        userListings.forEach(l => {
+          listingsContainer.innerHTML += `
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center">
+              <div>
+                <h4 class="font-tech text-sm font-bold text-slate-900">${l.title}</h4>
+                <p class="text-[10px] text-slate-500">📍 ${l.location} • ₹${l.rent}/week</p>
+              </div>
+              <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                ● ${l.status}
+              </span>
+            </div>
+          `;
+        });
+      }
+    }
+
+    function viewInDashboard() {
+      closeModal('checkoutModal');
+      openDashboard();
+    }
+
+    // INITIAL APP LOAD
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCatalog(inventory);
+    });
+  </script>
+</body>
+</html>
